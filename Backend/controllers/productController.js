@@ -25,3 +25,17 @@ exports.remove = async (req, res) => {
   await Product.findByIdAndDelete(req.params.id);
   res.json({ message: 'Produit supprimé' });
 };
+
+// exports.deleteAll = async (req, res) => {
+//   await Product.deleteMany({});
+//   res.json({ message: "Tous les produits ont été supprimés." });
+// };
+
+exports.deleteAllProducts = async (req, res) => {
+  try {
+    await Product.deleteMany({});
+    res.json({ message: "Tous les produits ont été supprimés." });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur lors de la suppression", error });
+  }
+};
