@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const Category = require("./Category");
+import mongoose from "mongoose";
+import Category from "./Category.js";
 
 const productSchema = new mongoose.Schema({
   name: {
@@ -9,25 +9,10 @@ const productSchema = new mongoose.Schema({
     minlength: 2,
     maxlength: 100
   },
-  model: {
-    type: String,
-    default: "",
-    trim: true
-  },
-  brand: {
-    type: String,
-    default: "",
-    trim: true
-  },
-  images: {
-    type: [String], // Tableau d'URLs
-    default: []
-  },
-  description: {
-    type: String,
-    default: "",
-    trim: true
-  },
+  model: { type: String, default: "", trim: true },
+  brand: { type: String, default: "", trim: true },
+  images: { type: [String], default: [] },
+  description: { type: String, default: "", trim: true },
   category: {
     type: String,
     required: [true, "La catégorie est requise"],
@@ -43,23 +28,10 @@ const productSchema = new mongoose.Schema({
     required: [true, "Le prix est requis"],
     min: 1
   },
-  stock: {
-    type: Number,
-    required: true,
-    default: 0,
-    min: 0
-  },
-  rating: {
-    type: Number,
-    default: 0,
-    min: 0,
-    max: 5
-  }
-}, {
-  timestamps: true
-});
+  stock: { type: Number, required: true, default: 0, min: 0 },
+  rating: { type: Number, default: 0, min: 0, max: 5 }
+}, { timestamps: true });
 
-/** 🔄 Synchronisation automatique des catégories */
 productSchema.post("save", async function () {
   try {
     const categoryName = this.category.trim();
@@ -68,10 +40,7 @@ productSchema.post("save", async function () {
     let categoryDoc = await Category.findOne({ name: categoryName });
 
     if (!categoryDoc) {
-      categoryDoc = new Category({
-        name: categoryName,
-        subcategories: [subcategoryName]
-      });
+      categoryDoc = new Category({ name: categoryName, subcategories: [subcategoryName] });
     } else {
       if (!categoryDoc.subcategories.includes(subcategoryName)) {
         categoryDoc.subcategories.push(subcategoryName);
@@ -105,4 +74,4 @@ productSchema.post("save", async function () {
 });
 
 const Product = mongoose.model("Product", productSchema);
-module.exports = Product;
+export default Product;

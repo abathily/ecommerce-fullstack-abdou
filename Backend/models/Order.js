@@ -1,15 +1,16 @@
-const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
+// models/Order.js
+import mongoose from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 
 const orderSchema = new mongoose.Schema({
-  // 👤 Utilisateur (optionnel si commande invitée)
+  // Utilisateur (optionnel si commande invitée)
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: false
   },
 
-  // 📦 Identifiant unique de commande
+  // Identifiant unique de commande
   orderId: {
     type: String,
     required: true,
@@ -17,21 +18,21 @@ const orderSchema = new mongoose.Schema({
     default: uuidv4
   },
 
-  // 🧍 Nom du client
+  // Nom du client
   name: {
     type: String,
     required: true,
     set: val => val.trim()
   },
 
-  // 📧 Email du client
+  // Email du client
   email: {
     type: String,
     required: true,
     set: val => val.trim().toLowerCase()
   },
 
-  // 🛒 Produits commandés
+  // Produits commandés
   products: [
     {
       productId: {
@@ -47,34 +48,35 @@ const orderSchema = new mongoose.Schema({
     }
   ],
 
-  // 💰 Total de la commande
+  // Total de la commande
   total: {
     type: Number,
     required: true,
     min: 0
   },
 
-  // 🏠 Adresse de livraison
+  // Adresse de livraison
   address: {
     type: String,
     required: true,
     set: val => val.trim()
   },
 
-  // 📞 Téléphone du client
+  // Téléphone du client
   phone: {
     type: String,
     required: true,
     set: val => val.trim()
   },
 
-  // 📦 Statut
+  // Statut
   status: {
     type: String,
     enum: ['Pending', 'Valide', 'Pas valide'],
     default: 'Pending'
   }
-
 }, { timestamps: true });
 
-module.exports = mongoose.model('Order', orderSchema);
+//  Export par défaut compatible ES Module
+const Order = mongoose.model('Order', orderSchema);
+export default Order;

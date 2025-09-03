@@ -10,10 +10,10 @@ import { protect, adminOnly } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-/** 🟢 Route publique **/
+/**  Route publique **/
 router.get('/', getAllCategories);
 
-/** 🔐 Routes sécurisées pour admin uniquement **/
+/**  Routes sécurisées pour admin uniquement **/
 router.post('/', protect, adminOnly, createCategory);
 router.put('/:id', protect, adminOnly, updateCategory);
 router.delete('/:id', protect, adminOnly, deleteCategory);

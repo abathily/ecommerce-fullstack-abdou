@@ -1,7 +1,8 @@
-const mongoose = require("mongoose");
+// models/Category.js
+import mongoose from "mongoose";
 
 const categorySchema = new mongoose.Schema({
-  // 🗂️ Nom de la catégorie principale
+  // Nom de la catégorie principale
   name: {
     type: String,
     required: [true, "Le nom de la catégorie est requis"],
@@ -10,7 +11,7 @@ const categorySchema = new mongoose.Schema({
     minlength: 2
   },
 
-  // 🗃️ Sous-catégories associées
+  // Sous-catégories associées
   subcategories: {
     type: [String],
     default: [],
@@ -28,4 +29,6 @@ const categorySchema = new mongoose.Schema({
 });
 
 const Category = mongoose.model("Category", categorySchema);
-module.exports = Category;
+
+// Export par défaut (obligatoire pour pouvoir faire `import Category from ...`)
+export default Category;

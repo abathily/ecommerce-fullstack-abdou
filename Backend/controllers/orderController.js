@@ -4,7 +4,7 @@ import nodemailer from "nodemailer";
 import { v4 as uuidv4 } from "uuid";
 import mongoose from "mongoose";
 
-// ✅ Créer une commande (connecté ou invité)
+//  Créer une commande (connecté ou invité)
 export const placeOrder = async (req, res) => {
   try {
     const {
@@ -97,14 +97,14 @@ export const placeOrder = async (req, res) => {
       const mailOptions = {
         from: process.env.MAIL_USER || "demo@mail.com",
         to: email,
-        subject: "🛍️ Confirmation de commande – Boutique Africaine",
+        subject: " Confirmation de commande – Boutique Africaine",
         html: `
           <h2>Bonjour ${name},</h2>
           <p>Commande <strong>#${orderId}</strong> enregistrée avec succès.</p>
           <p><strong>Total :</strong> ${Number(total).toLocaleString()} FCFA</p>
           <p><strong>Adresse :</strong> ${address}</p>
           <p><strong>Date :</strong> ${new Date().toLocaleString()}</p>
-          <p>📦 Votre commande est en cours de préparation.</p>
+          <p> Votre commande est en cours de préparation.</p>
           <hr />
           <p style="font-style: italic;">« Le fleuve fait des détours, mais n’oublie jamais sa destination. »</p>
           <p>— Boutique Africaine</p>
@@ -112,9 +112,9 @@ export const placeOrder = async (req, res) => {
       };
 
       await transporter.sendMail(mailOptions);
-      console.log("✅ Email envoyé à", email);
+      console.log(" Email envoyé à", email);
     } catch (emailError) {
-      console.warn("⚠️ Email non envoyé :", emailError.message);
+      console.warn(" Email non envoyé :", emailError.message);
     }
 
     res.status(201).json({
@@ -123,7 +123,7 @@ export const placeOrder = async (req, res) => {
       rejected: rejectedItems.length > 0 ? rejectedItems : undefined
     });
   } catch (err) {
-    console.error("🚨 Erreur complète serveur :", err);
+    console.error(" Erreur complète serveur :", err);
     res.status(500).json({
       message: "Erreur serveur interne. Veuillez vérifier les logs pour plus de détails.",
       debug: process.env.NODE_ENV === "development" ? err.stack : undefined
@@ -131,7 +131,7 @@ export const placeOrder = async (req, res) => {
   }
 };
 
-// ✅ Commandes personnelles
+//  Commandes personnelles
 export const getMyOrders = async (req, res) => {
   try {
     if (!req.user?._id) {
@@ -143,12 +143,12 @@ export const getMyOrders = async (req, res) => {
 
     res.json(orders);
   } catch (err) {
-    console.error("🚨 Erreur récupération commandes :", err);
+    console.error(" Erreur récupération commandes :", err);
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
 
-// ✅ Vue admin : toutes les commandes
+//  Vue admin : toutes les commandes
 export const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find().sort({ date: -1 })
@@ -157,12 +157,12 @@ export const getAllOrders = async (req, res) => {
 
     res.json(orders);
   } catch (err) {
-    console.error("🚨 Erreur admin commandes :", err);
+    console.error(" Erreur admin commandes :", err);
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
 
-// ✅ Admin : mise à jour du statut
+//  Admin : mise à jour du statut
 export const updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -179,7 +179,7 @@ export const updateOrderStatus = async (req, res) => {
 
     res.json(order);
   } catch (err) {
-    console.error("🚨 Erreur mise à jour commande :", err);
+    console.error(" Erreur mise à jour commande :", err);
     res.status(500).json({ message: "Erreur serveur." });
   }
 };

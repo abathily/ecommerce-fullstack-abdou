@@ -5,17 +5,17 @@ require('dotenv').config(); // si tu utilises .env pour MONGO_URI
 
 async function createAdmin() {
   try {
-    // 🔗 Connexion à la base
+    //  Connexion à la base
     await mongoose.connect(process.env.MONGO_URI);
-    console.log("✅ Connexion MongoDB réussie");
+    console.log(" Connexion MongoDB réussie");
 
     const existing = await User.findOne({ email: 'admin@example.com' });
     if (existing) {
-      console.log("⚠️ Un utilisateur admin existe déjà");
+      console.log(" Un utilisateur admin existe déjà");
       return;
     }
 
-    // 🔐 Hash du mot de passe
+    //  Hash du mot de passe
     const hashedPassword = await bcrypt.hash('admin123', 10);
 
     // 👤 Création du compte admin
@@ -27,9 +27,9 @@ async function createAdmin() {
     });
 
     await admin.save();
-    console.log("🎉 Compte admin créé avec succès !");
+    console.log(" Compte admin créé avec succès !");
   } catch (error) {
-    console.error("❌ Erreur création admin :", error.message);
+    console.error(" Erreur création admin :", error.message);
   } finally {
     mongoose.disconnect();
   }

@@ -1,4 +1,5 @@
 import express from 'express';
+
 import {
   registerUser,
   loginUser,
@@ -6,8 +7,8 @@ import {
   getAllUsers,
   deleteUser,
   updateUserAdminStatus,
-  createUserByAdmin, // ✅ à ajouter dans userController.js
-  resetUserPassword, // ✅ à créer dans userController.js
+  createUserByAdmin,    //  Admin crée un utilisateur
+  resetUserPassword     //  Admin réinitialise mot de passe
 } from '../controllers/userController.js';
 
 import { getAdminStats } from '../controllers/adminController.js';
@@ -16,24 +17,24 @@ import { protect, adminOnly } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 //
-// 🔓 Routes publiques (authentification)
+//  Routes publiques
 //
-router.post('/register', registerUser);      // 🔐 Créer un compte
-router.post('/login', loginUser);            // 🔓 Connexion
+router.post('/register', registerUser);     //  Inscription
+router.post('/login', loginUser);           //  Connexion
 
 //
-// 👤 Routes utilisateur connecté
+//  Routes utilisateurs connectés
 //
-router.get('/profile', protect, getProfile); // 👀 Voir son profil
+router.get('/profile', protect, getProfile); //  Voir son profil
 
 //
-// 👑 Routes admin uniquement
+//  Routes réservées à l’administrateur
 //
-router.get('/stats', protect, adminOnly, getAdminStats);              // 📊 Dashboard admin
-router.get('/users', protect, adminOnly, getAllUsers);                // 📋 Liste utilisateurs
-router.post('/users', protect, adminOnly, createUserByAdmin);         // ➕ Création admin→utilisateur
-router.put('/users/:id', protect, adminOnly, updateUserAdminStatus);  // 🔧 Mise à jour rôle
-router.delete('/users/:id', protect, adminOnly, deleteUser);          // 🗑️ Suppression utilisateur
-router.post('/reset-password', protect, adminOnly, resetUserPassword); // 🔐 Réinitialisation mot de passe
+router.get('/stats', protect, adminOnly, getAdminStats);                //  Statistiques admin
+router.get('/users', protect, adminOnly, getAllUsers);                  //  Liste utilisateurs
+router.post('/users', protect, adminOnly, createUserByAdmin);           //  Création utilisateur
+router.put('/users/:id', protect, adminOnly, updateUserAdminStatus);    //  Modifier rôle
+router.delete('/users/:id', protect, adminOnly, deleteUser);            //  Supprimer utilisateur
+router.post('/reset-password', protect, adminOnly, resetUserPassword); //  Réinitialiser mot de passe
 
 export default router;

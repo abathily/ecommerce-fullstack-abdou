@@ -1,7 +1,7 @@
 import Product from '../models/Product.js';
 import Category from '../models/Category.js';
 
-/** 🧪 Créer un produit */
+/**  Créer un produit */
 export const create = async (req, res) => {
   try {
     const newProduct = new Product(req.body);
@@ -9,7 +9,7 @@ export const create = async (req, res) => {
 
     const { category, subcategory } = savedProduct;
 
-    // 🔁 Mettre à jour les catégories dynamiquement
+    //  Mettre à jour les catégories dynamiquement
     if (category) {
       const existing = await Category.findOne({ name: category });
 
@@ -30,33 +30,33 @@ export const create = async (req, res) => {
 
     res.status(201).json(savedProduct);
   } catch (error) {
-    console.error('❌ Erreur création produit :', error);
+    console.error(' Erreur création produit :', error);
     res.status(500).json({ message: 'Erreur serveur lors de la création.' });
   }
 };
 
-/** 📦 Récupérer tous les produits avec filtres dynamiques */
+/**  Récupérer tous les produits avec filtres dynamiques */
 export const getAll = async (req, res) => {
   try {
     const { search, category, subcategory, priceOrder, brands } = req.query;
     const filter = {};
 
-    // 🔍 Recherche par nom
+    //  Recherche par nom
     if (search?.trim()) {
       filter.name = { $regex: search.trim(), $options: 'i' };
     }
 
-    // 📂 Catégorie
+    //  Catégorie
     if (category && category !== 'Toutes') {
       filter.category = new RegExp(`^${category}$`, 'i');
     }
 
-    // 📁 Sous-catégorie
+    //  Sous-catégorie
     if (subcategory && subcategory !== 'Toutes') {
       filter.subcategory = new RegExp(`^${subcategory}$`, 'i');
     }
 
-    // 🏷️ Marques
+    //  Marques
     if (brands) {
       const brandArray = brands
         .split(',')
@@ -67,7 +67,7 @@ export const getAll = async (req, res) => {
       }
     }
 
-    // 🔃 Tri par prix
+    //  Tri par prix
     const sort = {};
     if (priceOrder === 'asc') sort.price = 1;
     if (priceOrder === 'desc') sort.price = -1;
@@ -75,12 +75,12 @@ export const getAll = async (req, res) => {
     const products = await Product.find(filter).sort(sort);
     res.status(200).json(products);
   } catch (error) {
-    console.error('❌ Erreur récupération produits :', error);
+    console.error(' Erreur récupération produits :', error);
     res.status(500).json({ message: 'Erreur serveur lors du chargement.' });
   }
 };
 
-/** 🎯 Filtrage simplifié par catégories */
+/**  Filtrage simplifié par catégories */
 export const getFiltered = async (req, res) => {
   try {
     const { category, subcategory } = req.query;
@@ -97,12 +97,12 @@ export const getFiltered = async (req, res) => {
     const products = await Product.find(filter);
     res.status(200).json(products);
   } catch (error) {
-    console.error('❌ Erreur filtrage produits :', error);
+    console.error(' Erreur filtrage produits :', error);
     res.status(500).json({ message: 'Erreur serveur lors du filtrage.' });
   }
 };
 
-/** 🧾 Obtenir un produit par ID */
+/**  Obtenir un produit par ID */
 export const getOne = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -113,7 +113,7 @@ export const getOne = async (req, res) => {
   }
 };
 
-/** ✏️ Mettre à jour un produit */
+/**  Mettre à jour un produit */
 export const update = async (req, res) => {
   try {
     const updated = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -124,7 +124,7 @@ export const update = async (req, res) => {
   }
 };
 
-/** 🗑️ Supprimer un produit */
+/**  Supprimer un produit */
 export const remove = async (req, res) => {
   try {
     const deleted = await Product.findByIdAndDelete(req.params.id);
@@ -135,7 +135,7 @@ export const remove = async (req, res) => {
   }
 };
 
-/** 🧹 Supprimer tous les produits */
+/**  Supprimer tous les produits */
 export const deleteAllProducts = async (req, res) => {
   try {
     await Product.deleteMany({});
@@ -145,7 +145,7 @@ export const deleteAllProducts = async (req, res) => {
   }
 };
 
-/** 📚 Obtenir les catégories dynamiques */
+/**  Obtenir les catégories dynamiques */
 export const getDynamicCategories = async (req, res) => {
   try {
     const categories = await Category.find();
@@ -177,7 +177,7 @@ export const addProductImages = async (req, res) => {
 
     res.status(200).json(product);
   } catch (err) {
-    console.error('❌ Erreur ajout images :', err.message);
+    console.error(' Erreur ajout images :', err.message);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 };

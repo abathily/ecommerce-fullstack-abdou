@@ -13,7 +13,7 @@ import {
 
 const router = express.Router();
 
-/** 🧰 Configuration multer pour upload local **/
+/**  Configuration multer pour upload local **/
 const storage = multer.diskStorage({
   destination: 'uploads/',
   filename: (req, file, cb) => {
@@ -23,18 +23,18 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-/** 🟢 Routes publiques **/
-router.get('/', getAll); // ← ❗ filtre actif ici
+/**  Routes publiques **/
+router.get('/', getAll); // ←  filtre actif ici
 router.get('/categories/dynamic', getDynamicCategories);
 router.get('/:id', getOne);
 
-/** 🔐 Routes admin **/
+/**  Routes admin **/
 router.post('/', create); // ← ajoute ton auth si besoin
 router.put('/:id', update);
 router.delete('/:id', remove);
 router.delete('/delete-all', deleteAllProducts);
 
-/** 🖼️ Ajout d’images via liens et fichiers **/
+/** Ajout d’images via liens et fichiers **/
 router.post('/:id/images', upload.array('images'), addProductImages);
 
 export default router;

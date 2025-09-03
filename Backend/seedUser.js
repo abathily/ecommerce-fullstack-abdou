@@ -1,21 +1,38 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const User = require('./models/User');
+// seedUser.js
+import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import User from './models/User.js';
 
-async function createAdminUser() {
-  await mongoose.connect(process.env.MONGO_URI);
-  const hashed = await bcrypt.hash('123456', 10);
+dotenv.config();
 
-  const user = await User.create({
-    name: 'kov',
-    email: 'kov@yopmail.com',
-    password: hashed,
-    isAdmin: true
-  });
+async function seedAdminUser() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('✅ Connexion à MongoDB réussie');
 
-  console.log('✅ Utilisateur admin créé :', user);
-  mongoose.disconnect();
+    const existingAdmin = await User.findOne({ email: 'admin@kov.com' });
+    if (existingAdmin) {
+      console.log('⚠️ L\'utilisateur admin existe déjà');
+      return process.exit(0);
+    }
+
+    const admin = new User({
+      name: 'Admin',
+      email: 'admin@kov.com',
+      isAdmin: true,
+      role: 'admin',
+      privileges: ['manage-users', 'view-orders'], // adapte selon ton modèle
+    });
+
+    await admin.setPassword('Kov123@2025'); // méthode custom sur ton modèle User
+    await admin.save();
+
+    console.log('🎉 Utilisateur admin créé avec succès');
+    process.exit(0);
+  } catch (err) {
+    console.error('❌ Erreur de seed :', err);
+    process.exit(1);
+  }
 }
 
-createAdminUser();
+seedAdminUser();

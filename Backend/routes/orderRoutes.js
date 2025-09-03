@@ -11,23 +11,23 @@ import { protect, adminOnly } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 /* --------------------------------------------------
-   🛒 Commandes - Public & Utilisateur
+    Commandes - Public & Utilisateur
 ---------------------------------------------------*/
 
-// ✔️ Créer une commande (invité ou connecté)
+//  Créer une commande (invité ou connecté)
 router.post("/checkout", placeOrder);
 
-// 🔐 Récupérer mes commandes (utilisateur connecté)
+//  Récupérer mes commandes (utilisateur connecté)
 router.get("/my-orders", protect, getMyOrders);
 
 /* --------------------------------------------------
-   🔒 Commandes - Accès Admin
+    Commandes - Accès Admin
 ---------------------------------------------------*/
 
-// 📋 Voir toutes les commandes
+//  Voir toutes les commandes
 router.get("/", protect, adminOnly, getAllOrders);
 
-// 🖊️ Mettre à jour le statut d'une commande
+//  Mettre à jour le statut d'une commande
 router.put("/:id", protect, adminOnly, updateOrderStatus);
 
 export default router;

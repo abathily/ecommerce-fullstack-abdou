@@ -4,7 +4,7 @@ import Review from '../models/Review.js';
 const router = express.Router();
 
 /**
- * 📝 Ajouter un avis
+ *  Ajouter un avis
  * Requiert : productId, name, rating, comment
  */
 router.post('/', async (req, res) => {
@@ -21,13 +21,13 @@ router.post('/', async (req, res) => {
 
     res.status(201).json(saved);
   } catch (err) {
-    console.error('❌ Erreur création avis :', err.message);
+    console.error(' Erreur création avis :', err.message);
     res.status(500).json({ message: 'Erreur serveur lors de l’ajout de l’avis.' });
   }
 });
 
 /**
- * 📦 Récupérer les avis pour un produit
+ *  Récupérer les avis pour un produit
  * Paramètre : productId
  */
 router.get('/:productId', async (req, res) => {
@@ -36,7 +36,7 @@ router.get('/:productId', async (req, res) => {
 
     res.status(200).json(reviews);
   } catch (err) {
-    console.error('❌ Erreur chargement avis :', err.message);
+    console.error(' Erreur chargement avis :', err.message);
     res.status(500).json({ message: 'Erreur serveur lors de la récupération des avis.' });
   }
 });

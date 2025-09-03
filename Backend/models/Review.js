@@ -9,7 +9,7 @@ const reviewSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: false // 👤 Tu pourras le rendre obligatoire si tu relies aux utilisateurs connectés
+    required: false //  Tu pourras le rendre obligatoire si tu relies aux utilisateurs connectés
   },
   name: {
     type: String,
@@ -27,7 +27,7 @@ const reviewSchema = new mongoose.Schema({
     required: true
   }
 }, {
-  timestamps: true // ⏱️ Gère createdAt / updatedAt automatiquement
+  timestamps: true // ⏱ Gère createdAt / updatedAt automatiquement
 });
 
 const Review = mongoose.model('Review', reviewSchema);

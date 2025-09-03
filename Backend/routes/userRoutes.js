@@ -1,59 +1,72 @@
-import express from "express";
-import bcrypt from "bcryptjs";
-import User from "../models/User.js";
-
-// 🔒 Middlewares
-import { protect, adminOnly } from "../middleware/authMiddleware.js";
-
-// 🔹 Contrôleurs utilisateur
+// routes/userRoutes.js
+import express from 'express';
 import {
+  // Auth publiques
   registerUser,
   loginUser,
+
+  // Utilisateurs connectés
   getProfile,
+  updateUserProfile,
+  getConnectionCount,
+
+  // Admin
   getAllUsers,
   deleteUser,
-  getConnectionCount,
-  updateUserProfile,
   updateUserAdminStatus,
   createUserByAdmin,
-  updateUserPrivileges // ✅ Ajout pour modifier les privilèges
-} from "../controllers/userController.js";
+  updateUserPrivileges,
+  resetUserPassword,
 
-// 🔹 Contrôleurs auth avancés
-import {
-  register,
-  login,
-  getAllUsers as getAllAuthUsers,
+  // Debug
+  debugRegisterPayload,
+  debugPasswordCompare,
   testLoginDebug
-} from "../controllers/authController.js";
+} from '../controllers/userController.js';
 
-// 🔹 Statistiques admin
-import { getAdminStats } from "../controllers/adminController.js";
+import { getAdminStats } from '../controllers/adminController.js';
+import { protect, adminOnly } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 //
-// 🌐 Authentification
+// 🔓 Authentification publique
 //
-router.post("/register", register);                 // 🔐 Inscription
-router.post("/login", login);                       // 🔓 Connexion
-router.post("/test-login", testLoginDebug);         // 🧪 Debug bcrypt
+router.post('/register', registerUser);
+router.post('/login', loginUser);
 
 //
-// 👤 Routes utilisateur connecté
+// 🧪 Debug API (désactivé en production)
 //
-router.get("/profile", protect, getProfile);                          // 👀 Voir profil
-router.put("/:id", protect, updateUserProfile);                       // ✏️ Modifier son profil
-router.get("/:id/connections", protect, getConnectionCount);          // 🔢 Connexions
+if (process.env.NODE_ENV !== 'production') {
+  router.post('/debug/register', debugRegisterPayload);
+  router.post('/debug/password', debugPasswordCompare);
+  router.post('/debug/login-test', testLoginDebug);
+}
 
 //
-// 👑 Routes admin
+// 🔐 Routes utilisateur connecté
 //
-router.get("/", protect, adminOnly, getAllUsers);                     // 📋 Tous les utilisateurs
-router.delete("/:id", protect, adminOnly, deleteUser);                // 🗑️ Supprimer utilisateur
-router.put("/:id/admin", protect, adminOnly, updateUserAdminStatus); // 🔧 Mettre à jour rôle
-router.put("/:id/privileges", protect, adminOnly, updateUserPrivileges); // 🛠️ Mettre à jour privilèges
-router.post("/", protect, adminOnly, createUserByAdmin);             // ➕ Créer utilisateur
-router.get("/stats", protect, adminOnly, getAdminStats);             // 📊 Statistiques
+router.use(protect);
+
+router.get('/profile', getProfile);
+router.put('/profile', updateUserProfile);
+router.get('/connections/:id', getConnectionCount);
+
+//
+// 🔒 Routes administrateur
+//
+router.use(adminOnly);
+
+// Routes statiques prioritaires
+router.get('/stats', getAdminStats);
+
+// CRUD utilisateurs admin
+router.get('/', getAllUsers);
+router.post('/', createUserByAdmin);
+router.put('/:id/admin', updateUserAdminStatus);
+router.put('/:id/privileges', updateUserPrivileges);
+router.put('/:id/reset-password', resetUserPassword);
+router.delete('/:id', deleteUser);
 
 export default router;

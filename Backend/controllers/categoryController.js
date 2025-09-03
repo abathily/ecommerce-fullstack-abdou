@@ -1,6 +1,6 @@
 import Category from '../models/Category.js';
 
-/** 📦 Lire toutes les catégories **/
+/**  Lire toutes les catégories **/
 export const getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find();
@@ -19,12 +19,12 @@ export const getAllCategories = async (req, res) => {
 
     res.json(cleanedCategories);
   } catch (error) {
-    console.error('❌ Erreur récupération catégories :', error);
+    console.error(' Erreur récupération catégories :', error);
     res.status(500).json({ message: 'Erreur serveur lors du chargement des catégories.' });
   }
 };
 
-/** 🆕 Créer une nouvelle catégorie **/
+/**  Créer une nouvelle catégorie **/
 export const createCategory = async (req, res) => {
   try {
     const { name, subcategories } = req.body;
@@ -49,12 +49,12 @@ export const createCategory = async (req, res) => {
 
     res.status(201).json(category);
   } catch (error) {
-    console.error('❌ Erreur création catégorie :', error);
+    console.error(' Erreur création catégorie :', error);
     res.status(500).json({ message: 'Erreur serveur lors de la création.' });
   }
 };
 
-/** 🔁 Modifier une catégorie **/
+/**  Modifier une catégorie **/
 export const updateCategory = async (req, res) => {
   try {
     const { name, subcategories } = req.body;
@@ -73,12 +73,12 @@ export const updateCategory = async (req, res) => {
 
     res.json(category);
   } catch (error) {
-    console.error('❌ Erreur mise à jour catégorie :', error);
+    console.error(' Erreur mise à jour catégorie :', error);
     res.status(500).json({ message: 'Erreur serveur lors de la mise à jour.' });
   }
 };
 
-/** 🗑️ Supprimer une catégorie **/
+/**  Supprimer une catégorie **/
 export const deleteCategory = async (req, res) => {
   try {
     const category = await Category.findByIdAndDelete(req.params.id);
@@ -87,9 +87,9 @@ export const deleteCategory = async (req, res) => {
       return res.status(404).json({ message: 'Catégorie non trouvée.' });
     }
 
-    res.json({ message: `✅ Catégorie '${category.name}' supprimée.` });
+    res.json({ message: ` Catégorie '${category.name}' supprimée.` });
   } catch (error) {
-    console.error('❌ Erreur suppression catégorie :', error);
+    console.error(' Erreur suppression catégorie :', error);
     res.status(500).json({ message: 'Erreur serveur lors de la suppression.' });
   }
 };
