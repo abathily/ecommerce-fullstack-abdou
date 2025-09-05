@@ -1,0 +1,62 @@
+{
+  "name": "frontends",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@heroicons/react": "^2.2.0",
+    "@supabase/supabase-js": "^2.52.1",
+    "@tailwindcss/line-clamp": "^0.4.4",
+    "axios": "^1.10.0",
+    "chart.js": "^4.5.0",
+    "flowbite": "^3.1.2",
+    "framer-motion": "^12.23.9",
+    "jspdf": "^3.0.1",
+    "jwt-decode": "^4.0.0",
+    "qrcode.react": "^4.2.0",
+    "react": "^18.2.0",
+    "react-chartjs-2": "^5.3.0",
+    "react-csv": "^2.2.2",
+    "react-datepicker": "^8.4.0",
+    "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.5.2",
+    "react-id-swiper": "^4.0.0",
+    "react-qrcode-logo": "^3.0.0",
+    "react-router-dom": "^7.6.3",
+    "react-scripts": "5.0.1",
+    "swiper": "^11.2.10",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.14",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.4.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "jsx"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!(react-datepicker)/)"
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities; 
+
+.input {
+  @apply border rounded p-2 w-full focus:outline-none focus:ring-1 focus:ring-cyan-600;
+}
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  button, nav, footer {
+    display: none !important;
+  }
+}
+/* filter-btn - à placer dans index.css ou postcss */
+.filter-btn {
+  @apply bg-blue-50 hover:bg-blue-100 border border-blue-300 text-blue-700 rounded px-3 py-2 text-sm;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+ /* Scroll invisible  */
+.sidebar-scroll::-webkit-scrollbar {
+  width: 0;
+}
+.sidebar-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none; 
+}
+
