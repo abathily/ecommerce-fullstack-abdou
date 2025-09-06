@@ -1,4 +1,3 @@
-// server.js
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
@@ -21,7 +20,6 @@ import syncCategoriesFromProducts from "./syncCategoriesFromProducts.js";
 
 dotenv.config();
 
-// __dirname compatible ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -44,8 +42,6 @@ const defaultDevOrigins = [
   "http://127.0.0.1:5173",
 ];
 
-// ⚠️ IMPORTANT : sur Render, mets dans tes variables d’environnement :
-// CLIENT_ORIGIN=https://ton-site.netlify.app
 const envOrigins = (process.env.CLIENT_ORIGIN || "")
   .split(",")
   .map((o) => o.trim())
@@ -55,14 +51,9 @@ const allowedOrigins = envOrigins.length ? envOrigins : defaultDevOrigins;
 
 const corsOptions = {
   origin(origin, cb) {
-    if (!origin) return cb(null, true);
-    try {
-      const u = new URL(origin);
-      if (!isProd && (u.hostname === "localhost" || u.hostname === "127.0.0.1")) {
-        return cb(null, true);
-      }
-    } catch {}
-    if (allowedOrigins.includes(origin)) return cb(null, true);
+    if (!origin || allowedOrigins.includes(origin)) {
+      return cb(null, true);
+    }
     return cb(new Error(`Not allowed by CORS: ${origin}`));
   },
   credentials: true,
