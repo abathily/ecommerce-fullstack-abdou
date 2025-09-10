@@ -28,7 +28,7 @@ export default function Login() {
   const RAW_API_BASE =
     process.env.REACT_APP_API_URL ||
     process.env.VITE_API_URL ||
-    'http://localhost:5000';
+    'https://ecommerce-fullstack-abdou.onrender.com';
   const API_BASE = RAW_API_BASE.replace(/\/+$/, '');
   const LOGIN_URL = `${API_BASE}/api/users/login`;
 

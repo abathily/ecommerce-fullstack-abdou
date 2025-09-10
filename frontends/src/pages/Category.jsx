@@ -9,7 +9,7 @@ export default function Category() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/products/category/${slug}`)
+    axios.get(`https://ecommerce-fullstack-abdou.onrender.com/api/products/category/${slug}`)
       .then(res => {
         setProducts(res.data);
         setLoading(false);

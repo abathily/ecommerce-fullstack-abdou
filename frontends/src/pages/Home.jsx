@@ -65,11 +65,11 @@ export default function Home() {
             ...(filters.priceOrder && { priceOrder: filters.priceOrder }),
             ...(filters.brands.length && { brands: filters.brands.join(',') }),
           };
-          const res = await axios.get('http://localhost:5000/api/products', { params });
+          const res = await axios.get('https://ecommerce-fullstack-abdou.onrender.com/api/products', { params });
           setFilteredProducts(res.data);
           setModeFiltrage(true);
         } else {
-          const res = await axios.get('http://localhost:5000/api/products');
+          const res = await axios.get('https://ecommerce-fullstack-abdou.onrender.com/api/products');
           const produits = res.data;
           const regroupésParCatégorie = {};
           produits.forEach((prod) => {

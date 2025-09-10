@@ -12,7 +12,7 @@ export default function ProductReviews({ productId }) {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/reviews/${productId}`)
+      .get(`https://ecommerce-fullstack-abdou.onrender.com/api/reviews/${productId}`)
       .then((res) => {
         setReviews(res.data);
         setLoading(false);
@@ -23,7 +23,7 @@ export default function ProductReviews({ productId }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .post('http://localhost:5000/api/reviews', {
+      .post('https://ecommerce-fullstack-abdou.onrender.com/api/reviews', {
         productId,
         comment,
         rating,
@@ -32,7 +32,7 @@ export default function ProductReviews({ productId }) {
       .then(() => {
         setComment('');
         setRating(0);
-        return axios.get(`http://localhost:5000/api/reviews/${productId}`);
+        return axios.get(`https://ecommerce-fullstack-abdou.onrender.com/api/reviews/${productId}`);
       })
       .then((res) => setReviews(res.data))
       .catch((err) => console.error('❌ Erreur envoi avis :', err));

@@ -39,7 +39,7 @@ export default function Categories() {
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/categories');
+      const res = await axios.get('https://ecommerce-fullstack-abdou.onrender.com/api/categories');
       setCategories(res.data);
       setFilteredCategories(res.data);
     } catch (err) {
@@ -63,8 +63,8 @@ export default function Categories() {
 
     const payload = { name, subcategories };
     const endpoint = editingId
-      ? `http://localhost:5000/api/categories/${editingId}`
-      : 'http://localhost:5000/api/categories';
+      ? `https://ecommerce-fullstack-abdou.onrender.com/api/categories/${editingId}`
+      : 'https://ecommerce-fullstack-abdou.onrender.com/api/categories';
     const method = editingId ? axios.put : axios.post;
 
     try {
@@ -85,7 +85,7 @@ export default function Categories() {
   const handleDelete = async (id) => {
     if (!window.confirm('⚠️ Supprimer cette catégorie ?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/categories/${id}`, {
+      await axios.delete(`https://ecommerce-fullstack-abdou.onrender.com/api/categories/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchCategories();

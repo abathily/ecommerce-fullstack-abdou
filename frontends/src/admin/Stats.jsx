@@ -40,7 +40,7 @@ export default function Stats() {
     if (status) params.status = status;
 
     axios
-      .get('http://localhost:5000/api/admin/stats', {
+      .get('https://ecommerce-fullstack-abdou.onrender.com/api/admin/stats', {
         headers: { Authorization: `Bearer ${token}` },
         params,
       })

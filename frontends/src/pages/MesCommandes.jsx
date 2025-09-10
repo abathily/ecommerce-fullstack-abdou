@@ -20,7 +20,7 @@ export default function MesCommandes() {
   const API_BASE =
     (import.meta && import.meta.env && import.meta.env.VITE_API_URL) ||
     process.env.REACT_APP_API_URL ||
-    "http://localhost:5000";
+    "https://ecommerce-fullstack-abdou.onrender.com";
 
   const cacheKey = "orders:me";
 

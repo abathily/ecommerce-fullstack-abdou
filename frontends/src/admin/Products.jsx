@@ -26,7 +26,7 @@ export default function Products() {
   }, [search, products]);
 
   const fetch = async () => {
-    const res = await axios.get('http://localhost:5000/api/products');
+    const res = await axios.get('https://ecommerce-fullstack-abdou.onrender.com/api/products');
     setProducts(res.data); setFiltered(res.data);
   };
 
@@ -65,8 +65,8 @@ export default function Products() {
       };
 
       const url = editing
-        ? `http://localhost:5000/api/products/${editing._id}`
-        : 'http://localhost:5000/api/products';
+        ? `https://ecommerce-fullstack-abdou.onrender.com/api/products/${editing._id}`
+        : 'https://ecommerce-fullstack-abdou.onrender.com/api/products';
       const method = editing ? axios.put : axios.post;
 
       const { data: savedProduct } = await method(url, payload);
@@ -79,7 +79,7 @@ export default function Products() {
         form.imagesLinks.split(',').map(l => l.trim()).filter(Boolean)
       ));
 
-      await axios.post(`http://localhost:5000/api/products/${savedProduct._id}/images`, formData);
+      await axios.post(`https://ecommerce-fullstack-abdou.onrender.com/api/products/${savedProduct._id}/images`, formData);
 
       toast.success(editing ? '✅ Produit modifié !' : '✅ Produit ajouté !');
       fetch(); reset();
@@ -107,7 +107,7 @@ export default function Products() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/products/${id}`);
+      await axios.delete(`https://ecommerce-fullstack-abdou.onrender.com/api/products/${id}`);
       toast.success('🗑️ Produit supprimé.');
       fetch();
     } catch (err) {
