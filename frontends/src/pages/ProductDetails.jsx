@@ -23,13 +23,13 @@ export default function ProductDetails() {
     setSimilarProducts([]);
     window.scrollTo(0, 0);
 
-    axios.get(`https://ecommerce-fullstack-abdou.onrender.com/api/products/${id}`)
+    axios.get(`https://backend-9qig.onrender.com/api/products/${id}`)
       .then((res) => {
         const images = res.data.images?.length ? res.data.images : [res.data.image];
         setProduct(res.data);
         setSelectedImage(images[0]);
 
-        axios.get(`https://ecommerce-fullstack-abdou.onrender.com/api/products?category=${res.data.category}`)
+        axios.get(`https://backend-9qig.onrender.com/api/products?category=${res.data.category}`)
           .then((res2) => {
             const filtered = res2.data.filter((p) => p._id !== res.data._id);
             setSimilarProducts(filtered.slice(0, 4));

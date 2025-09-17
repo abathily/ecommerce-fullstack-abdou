@@ -42,7 +42,7 @@ export default function Users() {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('https://ecommerce-fullstack-abdou.onrender.com/api/users', {
+      const res = await axios.get('https://backend-9qig.onrender.com/api/users', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(res.data);
@@ -63,8 +63,8 @@ export default function Users() {
 
     const payload = { ...form };
     const url = editingId
-      ? `https://ecommerce-fullstack-abdou.onrender.com/api/users/${editingId}`
-      : 'https://ecommerce-fullstack-abdou.onrender.com/api/users';
+      ? `https://backend-9qig.onrender.com/api/users/${editingId}`
+      : 'https://backend-9qig.onrender.com/api/users';
     const method = editingId ? axios.put : axios.post;
 
     try {
@@ -80,7 +80,7 @@ export default function Users() {
   const handleDelete = async (id) => {
     if (!window.confirm('⚠️ Supprimer cet utilisateur ?')) return;
     try {
-      await axios.delete(`https://ecommerce-fullstack-abdou.onrender.com/api/users/${id}`, {
+      await axios.delete(`https://backend-9qig.onrender.com/api/users/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success('🗑️ Utilisateur supprimé');

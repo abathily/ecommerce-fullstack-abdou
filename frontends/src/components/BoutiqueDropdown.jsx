@@ -12,7 +12,7 @@ export default function BoutiqueDropdown() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get('https://ecommerce-fullstack-abdou.onrender.com/api/categories');
+        const res = await axios.get('https://backend-9qig.onrender.com/api/categories');
         const data = res.data;
 
         if (Array.isArray(data)) {

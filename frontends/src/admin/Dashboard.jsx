@@ -36,7 +36,7 @@ export default function Dashboard() {
       return;
     }
 
-    axios.get("https://ecommerce-fullstack-abdou.onrender.com/api/admin/stats", {
+    axios.get("https://backend-9qig.onrender.com/api/admin/stats", {
       headers: { Authorization: `Bearer ${token}` },
       withCredentials: true
     }).then(res => setStats(res.data))

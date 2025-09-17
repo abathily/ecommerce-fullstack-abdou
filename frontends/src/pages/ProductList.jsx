@@ -37,7 +37,7 @@ export default function ProductList() {
           ...(filters.brands.length && { brands: filters.brands.join(',') }),
         };
 
-        const { data } = await axios.get('https://ecommerce-fullstack-abdou.onrender.com/api/products', { params });
+        const { data } = await axios.get('https://backend-9qig.onrender.com/api/products', { params });
         setProducts(data);
       } catch (error) {
         console.error('❌ Erreur chargement produits :', error.message);

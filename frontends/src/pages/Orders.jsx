@@ -13,7 +13,7 @@ export default function Orders() {
     if (user && token) {
       setLoading(true);
       axios
-        .get('https://ecommerce-fullstack-abdou.onrender.com/api/orders/my-orders', {
+        .get('https://backend-9qig.onrender.com/api/orders/my-orders', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

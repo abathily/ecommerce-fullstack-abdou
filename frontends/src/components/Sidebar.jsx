@@ -10,7 +10,7 @@ export default function Sidebar({ filters, setFilters }) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get('https://ecommerce-fullstack-abdou.onrender.com/api/products/categories/dynamic');
+        const res = await axios.get('https://backend-9qig.onrender.com/api/products/categories/dynamic');
         setCategories(res.data);
       } catch (err) {
         console.error('Erreur chargement catégories :', err.message);

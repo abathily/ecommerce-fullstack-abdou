@@ -13,7 +13,7 @@ export default function Orders() {
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get('https://ecommerce-fullstack-abdou.onrender.com/api/orders', {
+      const res = await axios.get('https://backend-9qig.onrender.com/api/orders', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setOrders(res.data);
@@ -31,7 +31,7 @@ export default function Orders() {
   const handleStatusChange = async (id, newStatus) => {
     try {
       await axios.put(
-        `https://ecommerce-fullstack-abdou.onrender.com/api/orders/${id}`,
+        `https://backend-9qig.onrender.com/api/orders/${id}`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -28,8 +28,8 @@ export default function Login() {
   const RAW_API_BASE =
     process.env.REACT_APP_API_URL ||
     process.env.VITE_API_URL ||
-    'https://ecommerce-fullstack-abdou.onrender.com';
-  const API_BASE = RAW_API_BASE.replace(/\/+$/, '');
+    'https://backend-9qig.onrender.com';
+  const API_BASE = process.env.REACT_APP_API_URL || 'https://backend-9qig.onrender.com';
   const LOGIN_URL = `${API_BASE}/api/users/login`;
 
   // Redirection si déjà connecté
