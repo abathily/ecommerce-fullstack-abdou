@@ -1,37 +1,54 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const User = require('./models/User'); // adapte selon ton arborescence
-require('dotenv').config(); // si tu utilises .env pour MONGO_URI
+// createAdmin.js
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import User from './models/User.js'; // adapte le chemin si nécessaire
+
+dotenv.config();
+
+const MONGO_URI = process.env.MONGO_URI;
+if (!MONGO_URI) {
+  console.error('❌ MONGO_URI manquant dans .env');
+  process.exit(1);
+}
 
 async function createAdmin() {
   try {
-    //  Connexion à la base
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log(" Connexion MongoDB réussie");
+    await mongoose.connect(MONGO_URI, {
+      serverSelectionTimeoutMS: 15000,
+    });
+    console.log('✅ Connexion MongoDB réussie');
 
-    const existing = await User.findOne({ email: 'admin@example.com' });
+    const email = 'Admin@gmail.com';
+    const password = 'Admin123@2025';
+    const name = 'Admin';
+
+    const existing = await User.findOne({ email });
     if (existing) {
-      console.log(" Un utilisateur admin existe déjà");
+      console.log('⚠️ Utilisateur déjà existant');
       return;
     }
 
-    //  Hash du mot de passe
-    const hashedPassword = await bcrypt.hash('admin123', 10);
-
-    // 👤 Création du compte admin
     const admin = new User({
-      name: 'Super Admin',
-      email: 'admin@example.com',
-      password: hashedPassword,
-      isAdmin: true
+      name,
+      email,
+      password,
+      isAdmin: true,
+      role: 'admin',
+      privileges: ['manage_users', 'manage_products'],
     });
 
+    if (typeof admin.setPassword === 'function') {
+      await admin.setPassword(password); // méthode custom si présente
+    } else {
+      admin.password = password; // brut si pas de hash
+    }
+
     await admin.save();
-    console.log(" Compte admin créé avec succès !");
-  } catch (error) {
-    console.error(" Erreur création admin :", error.message);
+    console.log('✅ Utilisateur admin créé avec succès');
+  } catch (err) {
+    console.error('❌ Erreur création admin :', err?.message || err);
   } finally {
-    mongoose.disconnect();
+    await mongoose.disconnect();
   }
 }
 
