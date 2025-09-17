@@ -213,3 +213,20 @@ export const updateOrderStatus = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
+
+// 📦 Récupérer les commandes de l'utilisateur connecté
+export const getMyOrders = async (req, res) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId) return res.status(401).json({ message: "Utilisateur non authentifié" });
+
+    const orders = await Order.find({ user: userId })
+      .populate("products.productId", "name price")
+      .sort({ createdAt: -1 });
+
+    res.json(orders);
+  } catch (err) {
+    console.error("❌ Erreur récupération commandes utilisateur :", err?.message || err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
