@@ -2,27 +2,21 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 
 export default function Register() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
 
-  // Base URL (CRA ou Vite)
   const RAW_API_BASE =
     process.env.REACT_APP_API_URL ||
     process.env.VITE_API_URL ||
     'https://ecommerce-fullstack-abdou.onrender.com';
   const API_BASE = RAW_API_BASE.replace(/\/+$/, '');
-  const REGISTER_URL = `${API_BASE}/api/users/register`;
+  const REGISTER_URL = `${API_BASE}/api/auth/register`;
 
-  // State contrôlé
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  // UI state
   const [remember, setRemember] = useState(() => {
     try {
       return !!localStorage.getItem('remember_me');
@@ -30,37 +24,32 @@ export default function Register() {
       return false;
     }
   });
+
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPwd, setShowPwd] = useState(false);
-
   const abortRef = useRef(null);
 
-  // Validation
   const MIN_NAME_LEN = 2;
   const MIN_PWD_LEN = 8;
   const isValidEmail = (val) => /\S+@\S+\.\S+/.test(val);
   const isFormValid = useMemo(() => {
     const n = name.trim();
     const e = email.trim().toLowerCase();
-    const p = password; // ne pas trim
+    const p = password;
     return n.length >= MIN_NAME_LEN && isValidEmail(e) && p.length >= MIN_PWD_LEN;
   }, [name, email, password]);
 
-  // Nettoyage des requêtes en cours à l’unmount
   useEffect(() => {
     return () => {
-      if (abortRef.current) {
-        abortRef.current.abort();
-      }
+      if (abortRef.current) abortRef.current.abort();
     };
   }, []);
 
-  // Reset des erreurs à la saisie
   useEffect(() => {
     if (error) setError('');
-  }, [name, email, password]); // volontairement sans "error"
+  }, [name, email, password]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -70,7 +59,6 @@ export default function Register() {
     setSuccessMsg('');
     setLoading(true);
 
-    // Annule la requête précédente si existante
     if (abortRef.current) abortRef.current.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -79,11 +67,10 @@ export default function Register() {
       const payload = {
         name: name.trim(),
         email: email.trim().toLowerCase(),
-        password, // respecter exactement la saisie
-        remember, // si backend gère maxAge côté cookie
+        password,
+        remember,
       };
 
-      // Autorise aussi le cookie httpOnly si ton backend en pose un
       const { data, status } = await axios.post(REGISTER_URL, payload, {
         withCredentials: true,
         headers: {
@@ -94,43 +81,23 @@ export default function Register() {
         signal: controller.signal,
       });
 
-      // Attendu: 201 + { token, user } (ou 200)
       if ((status === 201 || status === 200) && data?.user) {
-        // Persistance "remember me" (comme Login)
         try {
           if (remember) localStorage.setItem('remember_me', '1');
           else localStorage.removeItem('remember_me');
-        } catch {
-          // stockage indisponible: ignorer
-        }
+        } catch {}
 
-        if (data?.token) {
-          // Connexion immédiate
-          await login(data.token, data.user, { remember });
-
-          // Redirection préférentielle vers la route d’origine
-          const from = location.state?.from;
-          const target = from
-            ? `${from.pathname}${from.search || ''}${from.hash || ''}`
-            : '/';
-          navigate(target, { replace: true });
-          return;
-        }
-
-        // Pas de token: fallback vers /login
-        setSuccessMsg('Compte créé avec succès. Redirection…');
-        setTimeout(() => navigate('/login', { replace: true }), 900);
+        setSuccessMsg('Compte créé avec succès. Redirection vers la connexion…');
+        setTimeout(() => navigate('/login', { replace: true }), 1000);
         return;
       }
 
       throw new Error('Réponse inattendue du serveur');
     } catch (err) {
       if (process.env.NODE_ENV !== 'production') {
-        // eslint-disable-next-line no-console
         console.error('Erreur d’inscription :', err);
       }
 
-      // Requête annulée: ne rien afficher
       const canceled =
         err?.name === 'CanceledError' ||
         err?.code === 'ERR_CANCELED';
@@ -165,8 +132,6 @@ export default function Register() {
     } finally {
       setLoading(false);
       abortRef.current = null;
-      // Optionnel: nettoyer le mot de passe après tentative
-      // setPassword('');
     }
   };
 
@@ -256,7 +221,7 @@ export default function Register() {
                 type={showPwd ? 'text' : 'password'}
                 autoComplete="new-password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)} // ne pas trim
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Votre mot de passe"
                 required
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 pr-12"
