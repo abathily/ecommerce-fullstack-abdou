@@ -14,12 +14,16 @@ import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+
 
 import User from "./models/User.js";
 import syncCategoriesFromProducts from "./syncCategoriesFromProducts.js";
 
 import debugRoutes from './routes/debugRoutes.js';
 app.use('/api/debug', debugRoutes);
+
+app.use("/api/auth", authRoutes);
 
 
 dotenv.config();
