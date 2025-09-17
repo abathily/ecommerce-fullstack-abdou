@@ -54,6 +54,7 @@ const corsOptions = {
     if (!origin || allowedOrigins.includes(origin)) {
       return cb(null, true);
     }
+    console.warn(`❌ CORS refusé pour : ${origin}`);
     return cb(new Error(`Not allowed by CORS: ${origin}`));
   },
   credentials: true,
@@ -144,8 +145,13 @@ let server;
 
 async function start() {
   try {
-    await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 15000 });
+    await mongoose.connect(MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 15000,
+    });
     console.log("✅ MongoDB connecté");
+    console.log(`🛠️ Environnement : ${process.env.NODE_ENV}`);
 
     try {
       await syncCategoriesFromProducts();
