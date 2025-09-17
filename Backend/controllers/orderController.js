@@ -180,3 +180,36 @@ export const getOrderById = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
+
+// 📋 Voir toutes les commandes (admin)
+export const getAllOrders = async (_req, res) => {
+  try {
+    const orders = await Order.find({})
+      .populate("products.productId", "name price")
+      .sort({ createdAt: -1 });
+
+    res.json(orders);
+  } catch (err) {
+    console.error("❌ Erreur récupération commandes :", err?.message || err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+// 🔄 Mettre à jour le statut d'une commande (admin)
+export const updateOrderStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const order = await Order.findOne({ orderId: id });
+    if (!order) return res.status(404).json({ message: "Commande introuvable" });
+
+    order.status = status || order.status;
+    await order.save();
+
+    res.json({ success: true, message: "Statut mis à jour", order });
+  } catch (err) {
+    console.error("❌ Erreur mise à jour statut :", err?.message || err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
