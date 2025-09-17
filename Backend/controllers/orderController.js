@@ -4,7 +4,7 @@ import nodemailer from "nodemailer";
 import { v4 as uuidv4 } from "uuid";
 import mongoose from "mongoose";
 
-//  Créer une commande (connecté ou invité)
+// 🛒 Créer une commande
 export const placeOrder = async (req, res) => {
   try {
     const {
@@ -14,8 +14,6 @@ export const placeOrder = async (req, res) => {
       name = "",
       email = ""
     } = req.body;
-
-    console.log("📦 Requête reçue :", { products, address, phone, name, email });
 
     const requiredFields = [address.trim(), phone.trim(), name.trim(), email.trim()];
     if (products.length === 0 || requiredFields.some(field => !field)) {
@@ -81,10 +79,11 @@ export const placeOrder = async (req, res) => {
       products: validItems,
       total,
       status: "Pending",
+      isPaid: false,
       date: new Date()
     });
 
-    // 📧 Envoi email
+    // 📧 Email de confirmation
     try {
       const transporter = nodemailer.createTransport({
         service: "gmail",
@@ -94,92 +93,90 @@ export const placeOrder = async (req, res) => {
         }
       });
 
-      const mailOptions = {
+      await transporter.sendMail({
         from: process.env.MAIL_USER || "demo@mail.com",
         to: email,
-        subject: " Confirmation de commande – Boutique Africaine",
+        subject: "Confirmation de commande - O'Sakha",
         html: `
-          <h2>Bonjour ${name},</h2>
-          <p>Commande <strong>#${orderId}</strong> enregistrée avec succès.</p>
-          <p><strong>Total :</strong> ${Number(total).toLocaleString()} FCFA</p>
-          <p><strong>Adresse :</strong> ${address}</p>
-          <p><strong>Date :</strong> ${new Date().toLocaleString()}</p>
-          <p> Votre commande est en cours de préparation.</p>
-          <hr />
-          <p style="font-style: italic;">« Le fleuve fait des détours, mais n’oublie jamais sa destination. »</p>
-          <p>— Boutique Africaine</p>
+          <h2>Merci pour votre commande !</h2>
+          <p>Commande #${order.orderId}</p>
+          <p>Total : ${order.total} CFA</p>
+          <p>Adresse : ${order.address}</p>
+          <p>Nous vous contacterons pour la livraison.</p>
         `
-      };
-
-      await transporter.sendMail(mailOptions);
-      console.log(" Email envoyé à", email);
-    } catch (emailError) {
-      console.warn(" Email non envoyé :", emailError.message);
+      });
+    } catch (err) {
+      console.warn("⚠️ Email non envoyé :", err?.message || err);
     }
 
-    res.status(201).json({
-      message: "Commande enregistrée.",
-      orderId,
-      rejected: rejectedItems.length > 0 ? rejectedItems : undefined
-    });
+    res.status(201).json({ success: true, order });
   } catch (err) {
-    console.error(" Erreur complète serveur :", err);
-    res.status(500).json({
-      message: "Erreur serveur interne. Veuillez vérifier les logs pour plus de détails.",
-      debug: process.env.NODE_ENV === "development" ? err.stack : undefined
-    });
+    console.error("❌ Erreur création commande :", err?.message || err);
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
-//  Commandes personnelles
-export const getMyOrders = async (req, res) => {
+// 💳 Valider le paiement
+export const placePayment = async (req, res) => {
+  const { id } = req.params;
+  const { name, email, cardNumber } = req.body;
+
   try {
-    if (!req.user?._id) {
-      return res.status(401).json({ message: "Authentification requise." });
+    const order = await Order.findOne({ orderId: id });
+    if (!order) return res.status(404).json({ message: "Commande introuvable" });
+
+    order.isPaid = true;
+    order.paidAt = new Date();
+    order.status = "Paid";
+    await order.save();
+
+    // 📧 Reçu de paiement
+    try {
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.MAIL_USER || "demo@mail.com",
+          pass: process.env.MAIL_PASS || "demoPass"
+        }
+      });
+
+      await transporter.sendMail({
+        from: process.env.MAIL_USER || "demo@mail.com",
+        to: email,
+        subject: "Reçu de paiement - O'Sakha",
+        html: `
+          <h2>Reçu de commande</h2>
+          <p>Commande #${order.orderId}</p>
+          <p>Total payé : ${order.total} CFA</p>
+          <p>Date : ${new Date(order.paidAt).toLocaleString()}</p>
+          <p>Merci pour votre achat chez O'Sakha !</p>
+        `
+      });
+    } catch (err) {
+      console.warn("⚠️ Reçu non envoyé :", err?.message || err);
     }
 
-    const orders = await Order.find({ user: req.user._id }).sort({ date: -1 })
-      .populate("products.productId");
-
-    res.json(orders);
+    res.json({ success: true, message: "Paiement validé", order });
   } catch (err) {
-    console.error(" Erreur récupération commandes :", err);
-    res.status(500).json({ message: "Erreur serveur." });
+    console.error("❌ Erreur paiement :", err?.message || err);
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
-//  Vue admin : toutes les commandes
-export const getAllOrders = async (req, res) => {
+// 📄 Récupérer une commande spécifique
+export const getOrderById = async (req, res) => {
+  const { id } = req.params;
+
   try {
-    const orders = await Order.find().sort({ date: -1 })
-      .populate("user", "name email")
-      .populate("products.productId");
-
-    res.json(orders);
-  } catch (err) {
-    console.error(" Erreur admin commandes :", err);
-    res.status(500).json({ message: "Erreur serveur." });
-  }
-};
-
-//  Admin : mise à jour du statut
-export const updateOrderStatus = async (req, res) => {
-  try {
-    const { status } = req.body;
-
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    ).populate("user", "name email");
+    const order = await Order.findOne({ orderId: id }).populate("products.productId", "name price");
 
     if (!order) {
-      return res.status(404).json({ message: "Commande non trouvée." });
+      return res.status(404).json({ message: "Commande introuvable" });
     }
 
     res.json(order);
   } catch (err) {
-    console.error(" Erreur mise à jour commande :", err);
-    res.status(500).json({ message: "Erreur serveur." });
+    console.error("❌ Erreur récupération commande :", err?.message || err);
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };

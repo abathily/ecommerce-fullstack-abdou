@@ -1,123 +1,13 @@
-// src/pages/orderSummary.jsx
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { QRCode } from "react-qrcode-logo";
+import axios from "axios";
 
-// Polyfill si crypto.randomUUID n'est pas dispo
-function genId() {
-  if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
-  return "ord_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+const API_BASE = import.meta.env.VITE_API_BASE || "https://backend-osakha.onrender.com";
+
+function fmt(n) {
+  return (Number(n) || 0).toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " CFA";
 }
-
-// Récupère la dernière commande stockée en local
-function parseOrderFromStorage() {
-  const primary = localStorage.getItem("order");
-  const last = localStorage.getItem("lastOrder");
-  const raw = primary || last;
-  if (!raw) return null;
-  try {
-    const data = JSON.parse(raw);
-    return data && typeof data === "object" ? data : null;
-  } catch {
-    return null;
-  }
-}
-
-// Normalisation robuste pour différents schémas { products | items | cart }
-function normalizeOrder(raw) {
-  if (!raw || typeof raw !== "object") return null;
-
-  const source =
-    (Array.isArray(raw.products) && raw.products) ||
-    (Array.isArray(raw.items) && raw.items) ||
-    (Array.isArray(raw.cart) && raw.cart) ||
-    [];
-
-  const products = source.map((item) => {
-    const id = item.productId ?? item.id ?? undefined;
-    const name = item.name ?? item.title ?? item.productName ?? "Produit";
-
-    const price =
-      Number(
-        typeof item.price === "number" ? item.price : item.unitPrice ?? item.price
-      ) || 0;
-
-    const quantity =
-      Number(
-        typeof item.quantity === "number" ? item.quantity : item.qty ?? item.quantity
-      ) || 1;
-
-    return { id, name, price, quantity };
-  });
-
-  const computedSubtotal = products.reduce((sum, p) => sum + p.price * p.quantity, 0);
-  const taxRate =
-    typeof raw.tvaRate === "number" && raw.tvaRate >= 0 && raw.tvaRate <= 1
-      ? raw.tvaRate
-      : 0.18;
-
-  const subtotal = typeof raw.subtotal === "number" ? raw.subtotal : computedSubtotal;
-  const tva = typeof raw.tva === "number" ? raw.tva : subtotal * taxRate;
-  const total =
-    typeof raw.total === "number"
-      ? raw.total
-      : Math.round((subtotal + tva) * 100) / 100;
-
-  const date =
-    raw.date ||
-    new Date().toLocaleString("fr-FR", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-
-  return {
-    orderId: raw.orderId || genId(),
-    date,
-    name: raw.name || raw.customerName || "Client",
-    email: raw.email || raw.customerEmail || "",
-    phone: raw.phone || raw.customerPhone || "",
-    address: raw.address || raw.shippingAddress || "",
-    products,
-    subtotal,
-    tva,
-    total,
-    tvaRate: taxRate,
-  };
-}
-
-// Persiste l'ordre et maintient un index local
-function persistOrder(order) {
-  if (!order || !order.orderId) return;
-
-  localStorage.setItem("order", JSON.stringify(order));
-  localStorage.setItem(`order:${order.orderId}`, JSON.stringify(order));
-
-  let index = [];
-  try {
-    index = JSON.parse(localStorage.getItem("ordersIndex")) || [];
-  } catch {
-    index = [];
-  }
-  if (!index.some((it) => it.orderId === order.orderId)) {
-    index.unshift({
-      orderId: order.orderId,
-      date: order.date,
-      total: order.total,
-      name: order.name,
-    });
-    localStorage.setItem("ordersIndex", JSON.stringify(index.slice(0, 50)));
-  }
-
-  // Notifie la navbar (lien "Résumé" conditionnel)
-  window.dispatchEvent(new Event("order:updated"));
-}
-
-const fmt = (n) =>
-  (Number(n) || 0).toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " CFA";
 
 export default function OrderSummary() {
   const navigate = useNavigate();
@@ -125,33 +15,50 @@ export default function OrderSummary() {
   const [order, setOrder] = useState(null);
   const clearedRef = useRef(false);
 
-  // Préférence à l'ordre passé via navigate(state), sinon fallback localStorage
   useEffect(() => {
-    const rawState =
-      (location.state && typeof location.state === "object" && location.state.order) ||
-      (location.state && typeof location.state === "object" && location.state) ||
+    const orderId =
+      location.state?.orderId ||
+      localStorage.getItem("lastOrderId") ||
       null;
 
-    if (rawState) {
-      const normalized = normalizeOrder(rawState);
-      if (normalized) {
-        setOrder(normalized);
-        return;
-      }
-    }
-    const raw = parseOrderFromStorage();
-    const normalized = normalizeOrder(raw);
-    if (normalized) setOrder(normalized);
+    if (!orderId) return;
+
+    axios.get(`${API_BASE}/api/orders/${orderId}`)
+      .then((res) => {
+        const raw = res.data;
+        const products = raw.products.map((item) => ({
+          id: item.productId?._id || item.productId,
+          name: item.productId?.name || item.name || "Produit",
+          price: item.productId?.price || item.price || 0,
+          quantity: item.quantity || 1,
+        }));
+
+        const subtotal = products.reduce((sum, p) => sum + p.price * p.quantity, 0);
+        const tvaRate = 0.18;
+        const tva = subtotal * tvaRate;
+        const total = subtotal + tva;
+
+        setOrder({
+          orderId: raw.orderId,
+          name: raw.name,
+          email: raw.email,
+          phone: raw.phone,
+          address: raw.address,
+          date: new Date(raw.date).toLocaleString("fr-FR"),
+          isPaid: raw.isPaid,
+          paidAt: raw.paidAt,
+          products,
+          subtotal,
+          tva,
+          total,
+          tvaRate,
+        });
+      })
+      .catch((err) => {
+        console.error("❌ Erreur chargement commande :", err);
+      });
   }, [location.state]);
 
-  // Persist, titre, et signal "order:updated"
-  useEffect(() => {
-    if (!order) return;
-    persistOrder(order);
-    document.title = `Résumé commande #${order.orderId}`;
-  }, [order]);
-
-  // Vider le panier UNE SEULE FOIS après confirmation (MAJ badge Navbar)
   useEffect(() => {
     if (!order || clearedRef.current) return;
     clearedRef.current = true;
@@ -171,7 +78,7 @@ export default function OrderSummary() {
 
   const handleTrack = () => {
     if (!order?.orderId) return;
-    navigate(`/Orders/${order.orderId}`, { state: { orderId: order.orderId, order } });
+    navigate(`/Orders/${order.orderId}`, { state: { orderId: order.orderId } });
   };
 
   if (!order) {
@@ -218,22 +125,23 @@ export default function OrderSummary() {
           N° facture : <strong>{order.orderId}</strong>
         </p>
         <p className="text-sm">{order.date}</p>
+        {order.isPaid ? (
+          <p className="text-sm text-green-600 dark:text-green-400">
+            ✅ Payée le : <strong>{new Date(order.paidAt).toLocaleString()}</strong>
+          </p>
+        ) : (
+          <p className="text-sm text-yellow-600 dark:text-yellow-400">
+            ⏳ Paiement en attente
+          </p>
+        )}
       </div>
 
       {/* Infos client */}
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-4 rounded mb-6 text-sm relative z-10 print:text-black">
-        <p>
-          <strong>Nom :</strong> {order.name}
-        </p>
-        <p>
-          <strong>Email :</strong> {order.email || "—"}
-        </p>
-        <p>
-          <strong>Téléphone :</strong> {order.phone || "—"}
-        </p>
-        <p>
-          <strong>Adresse :</strong> {order.address || "—"}
-        </p>
+        <p><strong>Nom :</strong> {order.name}</p>
+        <p><strong>Email :</strong> {order.email || "—"}</p>
+        <p><strong>Téléphone :</strong> {order.phone || "—"}</p>
+        <p><strong>Adresse :</strong> {order.address || "—"}</p>
       </div>
 
       {/* Produits */}
@@ -248,17 +156,14 @@ export default function OrderSummary() {
             </tr>
           </thead>
           <tbody>
-            {order.products.map((item, idx) => {
-              const key = item.id ?? `${item.name}-${idx}`;
-              return (
-                <tr key={key} className="border-b border-gray-200 dark:border-gray-800">
-                  <td className="py-2 pr-2">{item.name}</td>
-                  <td className="py-2 pr-2">{item.quantity}</td>
-                  <td className="py-2 pr-2">{fmt(item.price)}</td>
-                  <td className="py-2">{fmt(item.price * item.quantity)}</td>
-                </tr>
-              );
-            })}
+            {order.products.map((item, idx) => (
+              <tr key={item.id ?? `${item.name}-${idx}`} className="border-b border-gray-200 dark:border-gray-800">
+                <td className="py-2 pr-2">{item.name}</td>
+                <td className="py-2 pr-2">{item.quantity}</td>
+                <td className="py-2 pr-2">{fmt(item.price)}</td>
+                <td className="py-2">{fmt(item.price * item.quantity)}</td>
+              </tr>
+            ))}
             {order.products.length === 0 && (
               <tr>
                 <td colSpan={4} className="py-3 text-center text-gray-500 dark:text-gray-400">
@@ -271,12 +176,8 @@ export default function OrderSummary() {
 
         {/* Totaux */}
         <div className="mt-4 text-sm text-right space-y-1">
-          <p>
-            <strong>Sous-total HT :</strong> {fmt(order.subtotal)}
-          </p>
-          <p>
-            <strong>TVA ({Math.round((order.tvaRate ?? 0.18) * 100)}%) :</strong> {fmt(order.tva)}
-          </p>
+          <p><strong>Sous-total HT :</strong> {fmt(order.subtotal)}</p>
+          <p><strong>TVA ({Math.round(order.tvaRate * 100)}%) :</strong> {fmt(order.tva)}</p>
           <p className="text-xl font-bold text-green-600 dark:text-green-400">
             Total TTC : {fmt(order.total)}
           </p>
