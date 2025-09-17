@@ -1,7 +1,9 @@
-// src/pages/Checkout.jsx
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import axios from "axios";
+
+const API_BASE = import.meta.env.VITE_API_BASE || "https://backend-osakha.onrender.com";
 
 function genId() {
   if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
@@ -51,7 +53,7 @@ export default function Checkout() {
     setClientInfo((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleOrder = () => {
+  const handleOrder = async () => {
     if (isSubmitting) return;
 
     const { name, email, phone, address } = clientInfo;
@@ -91,13 +93,19 @@ export default function Checkout() {
       }),
     };
 
-    // Enregistrer la commande pour fallback
-    localStorage.setItem("order", JSON.stringify(order));
-    localStorage.setItem("lastOrderId", order.orderId);
+    try {
+      const response = await axios.post(`${API_BASE}/api/orders/checkout`, order);
+      const savedOrder = response.data.order;
 
-    toast.success("✅ Commande réussie !");
-    // Redirection — ne pas vider le panier ici
-    navigate("/OrderSummary", { state: { order } });
+      localStorage.setItem("order", JSON.stringify(savedOrder));
+      localStorage.setItem("lastOrderId", savedOrder.orderId);
+
+      toast.success("✅ Commande enregistrée !");
+      navigate("/payment", { state: { orderId: savedOrder.orderId, email: savedOrder.email } });
+    } catch (err) {
+      console.error("❌ Erreur création commande :", err);
+      toast.error("Erreur lors de la commande.");
+    }
 
     setIsSubmitting(false);
   };
