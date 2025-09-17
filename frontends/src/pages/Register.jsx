@@ -7,11 +7,10 @@ export default function Register() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const RAW_API_BASE =
+  const API_BASE =
     process.env.REACT_APP_API_URL ||
     process.env.VITE_API_URL ||
     'https://backend-9qig.onrender.com';
-  const API_BASE = process.env.REACT_APP_API_URL || 'https://backend-9qig.onrender.com';
   const REGISTER_URL = `${API_BASE}/api/auth/register`;
 
   const [name, setName] = useState('');
