@@ -18,6 +18,10 @@ import contactRoutes from "./routes/contactRoutes.js";
 import User from "./models/User.js";
 import syncCategoriesFromProducts from "./syncCategoriesFromProducts.js";
 
+import debugRoutes from './routes/debugRoutes.js';
+app.use('/api/debug', debugRoutes);
+
+
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
