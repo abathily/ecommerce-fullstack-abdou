@@ -5,7 +5,6 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@supabase/supabase-js": "^2.52.1",
-    "@tailwindcss/line-clamp": "^0.4.4",
     "axios": "^1.10.0",
     "chart.js": "^4.5.0",
     "flowbite": "^3.1.2",
@@ -27,10 +26,15 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.14",
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/line-clamp": "^0.4.4",
+    "@tailwindcss/postcss": "^4.1.13",
+    "@tailwindcss/typography": "^0.5.16",
+    "autoprefixer": "^10.4.21",
     "eslint-plugin-react-hooks": "^5.2.0",
-    "postcss": "^8.4.21",
-    "tailwindcss": "^3.4.1"
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17"
   },
   "scripts": {
     "start": "react-scripts start",

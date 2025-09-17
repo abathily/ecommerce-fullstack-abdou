@@ -3,7 +3,7 @@ module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}"
   ],
-  darkMode: 'class', // active le dark mode via une classe 'dark'
+  darkMode: 'class',
   theme: {
     extend: {
       animation: {
@@ -16,14 +16,28 @@ module.exports = {
           '100%': { opacity: 1 },
         },
       },
-      // Tu peux aussi étendre les couleurs ici pour le mode sombre
       colors: {
-        darkBg: '#1a202c', // exemple pour les fonds
-        darkText: '#f0f0f0', // exemple pour le texte
+        darkBg: '#1a202c',
+        darkText: '#f0f0f0',
+      },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        serif: ['Merriweather', 'serif'],
+      },
+      screens: {
+        xs: '480px',
+        sm: '640px',
+        md: '768px',
+        lg: '1024px',
+        xl: '1280px',
+        '2xl': '1536px',
       },
     },
   },
   plugins: [
-    //require('@tailwindcss/line-clamp'),
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/aspect-ratio'),
+    require('@tailwindcss/line-clamp'),
   ],
 };
