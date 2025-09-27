@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 
 // ✅ Correction ici : syntaxe CRA
-const API_BASE = process.env.REACT_APP_API_BASE || "https://backend-osakha.onrender.com";
+const API_BASE = process.env.REACT_APP_API_BASE || "https://backend-9qig.onrender.com";
 
 function genId() {
   if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
