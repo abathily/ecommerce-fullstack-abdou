@@ -20,18 +20,18 @@ export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [error, setError] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { token, user, isLoading } = useAuth(); // 🔄 ajout isLoading
+  const { token, user, isLoading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isLoading) return; // ⏳ attend que le contexte charge
+    if (isLoading) return;
 
     if (!token || !user) {
       navigate('/login');
       return;
     }
 
-    if (!user.isAdmin) {
+    if (!user?.isAdmin) {
       setError("Accès refusé : réservé aux administrateurs.");
       return;
     }
@@ -39,8 +39,9 @@ export default function Dashboard() {
     axios.get("https://backend-9qig.onrender.com/api/admin/stats", {
       headers: { Authorization: `Bearer ${token}` },
       withCredentials: true
-    }).then(res => setStats(res.data))
-      .catch(() => setError("Statistiques non disponibles."));
+    })
+    .then(res => setStats(res.data))
+    .catch(() => setError("Statistiques non disponibles."));
   }, [token, user, isLoading, navigate]);
 
   const avatarMap = {
@@ -105,17 +106,17 @@ export default function Dashboard() {
 
         <h1 className="text-3xl font-bold mb-4">📊 Tableau de bord</h1>
 
-        {user && (
+        {!isLoading && user && (
           <div className="mb-6 flex items-center justify-between p-4 bg-cyan-100 dark:bg-cyan-800 rounded shadow">
             <div>
               <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Connecté en tant que</p>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                {user.name} — <span className="italic">{user.role || 'Admin'}</span>
+                {user?.name || "Utilisateur"} — <span className="italic">{user?.role || 'Admin'}</span>
               </h2>
             </div>
             <img
               src={avatarMap[user?.role] || '/assets/avatar-default.png'}
-              alt={`Avatar ${user?.role}`}
+              alt={`Avatar ${user?.role || 'default'}`}
               className="w-12 h-12 rounded-full border-2 border-white shadow-md"
             />
           </div>
