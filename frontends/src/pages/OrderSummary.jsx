@@ -4,7 +4,6 @@ import { QRCode } from "react-qrcode-logo";
 import axios from "axios";
 
 const API_BASE = process.env.REACT_APP_API_BASE || "https://backend-9qig.onrender.com";
-
 function fmt(n) {
   return (Number(n) || 0).toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " CFA";
 }
