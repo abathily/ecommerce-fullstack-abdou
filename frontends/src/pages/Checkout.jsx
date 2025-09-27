@@ -27,7 +27,10 @@ export default function Checkout() {
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        setCart(Array.isArray(parsed) ? parsed : []);
+        const validItems = Array.isArray(parsed)
+          ? parsed.filter((item) => item && typeof item === "object")
+          : [];
+        setCart(validItems);
       } catch (err) {
         console.error("Erreur chargement panier :", err);
       }
@@ -36,8 +39,8 @@ export default function Checkout() {
 
   const totals = useMemo(() => {
     const subtotal = cart.reduce((acc, item) => {
-      const price = typeof item.price === "number" ? item.price : Number(item.price) || 0;
-      const quantity = typeof item.quantity === "number" ? item.quantity : Number(item.quantity) || 1;
+      const price = typeof item?.price === "number" ? item.price : Number(item?.price) || 0;
+      const quantity = typeof item?.quantity === "number" ? item.quantity : Number(item?.quantity) || 1;
       return acc + price * quantity;
     }, 0);
     const tva = subtotal * 0.18;
@@ -68,12 +71,14 @@ export default function Checkout() {
 
     setIsSubmitting(true);
 
-    const products = cart.map((item) => ({
-      productId: item._id ?? item.id ?? undefined,
-      quantity: item.quantity,
-      name: item.name || "Produit",
-      price: typeof item.price === "number" ? item.price : Number(item.price) || 0,
-    }));
+    const products = cart
+      .filter((item) => item && (item._id || item.id))
+      .map((item) => ({
+        productId: item._id ?? item.id,
+        quantity: item.quantity || 1,
+        name: item.name || "Produit",
+        price: typeof item.price === "number" ? item.price : Number(item.price) || 0,
+      }));
 
     const order = {
       orderId: genId(),
@@ -101,7 +106,12 @@ export default function Checkout() {
       localStorage.setItem("lastOrderId", savedOrder.orderId);
 
       toast.success("✅ Commande enregistrée !");
-      navigate("/payment", { state: { orderId: savedOrder.orderId, email: savedOrder.email } });
+      navigate("/payment", {
+        state: {
+          orderId: savedOrder?.orderId || order.orderId,
+          email: savedOrder?.email || clientInfo.email,
+        },
+      });
     } catch (err) {
       console.error("❌ Erreur création commande :", err);
       toast.error("Erreur lors de la commande.");
@@ -148,11 +158,11 @@ export default function Checkout() {
         ) : (
           <>
             {cart.map((item, i) => {
-              const price = typeof item.price === "number" ? item.price : Number(item.price) || 0;
+              const price = typeof item?.price === "number" ? item.price : Number(item?.price) || 0;
               return (
                 <div key={i} className="flex justify-between border-b border-gray-300 dark:border-gray-700 py-2">
-                  <span>{item.name} × {item.quantity}</span>
-                  <span>{fmt(price * item.quantity)}</span>
+                  <span>{item?.name || "Produit"} × {item?.quantity || 1}</span>
+                  <span>{fmt(price * (item?.quantity || 1))}</span>
                 </div>
               );
             })}
