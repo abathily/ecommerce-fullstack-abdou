@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "https://backend-osakha.onrender.com";
+// ✅ Correction ici : syntaxe CRA
+const API_BASE = process.env.REACT_APP_API_BASE || "https://backend-osakha.onrender.com";
 
 function genId() {
   if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
