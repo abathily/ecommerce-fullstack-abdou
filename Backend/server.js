@@ -43,12 +43,19 @@ const defaultDevOrigins = [
   "http://127.0.0.1:5173",
 ];
 
+// ✅ Ajout de ton domaine Vercel ici
+const vercelOrigin = "https://ecommerce-fullstack-abdou.vercel.app";
+
 const envOrigins = (process.env.CLIENT_ORIGIN || "")
   .split(",")
   .map((o) => o.trim())
   .filter(Boolean);
 
-const allowedOrigins = envOrigins.length ? envOrigins : defaultDevOrigins;
+const allowedOrigins = [...new Set([
+  ...defaultDevOrigins,
+  vercelOrigin,
+  ...envOrigins,
+])];
 
 const corsOptions = {
   origin(origin, cb) {
